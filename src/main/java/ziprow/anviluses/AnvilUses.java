@@ -2,14 +2,15 @@ package ziprow.anviluses;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Objects;
 
 public class AnvilUses implements ModInitializer
 {
@@ -22,23 +23,18 @@ public class AnvilUses implements ModInitializer
 	{
 		LOGGER.info("AnvilUses is initializing!");
 
-		ItemTooltipCallback.EVENT.register(this::onItemTooltip);
+		ItemTooltipCallback.EVENT.register((item, context, type, tooltip) -> onItemTooltip(item, tooltip));
 	}
 
-	private void onItemTooltip(ItemStack item, TooltipContext context, List<Text> tooltip)
+	private void onItemTooltip(ItemStack item, List<Text> tooltip)
 	{
-		if(!item.hasNbt()) return;
+		if(!item.getComponents().contains(DataComponentTypes.REPAIR_COST)) return;
 
-		assert item.getNbt() != null;
+		int repairCost = item.getOrDefault(DataComponentTypes.REPAIR_COST, 0);
 
-		if(item.getNbt().contains("RepairCost"))
-		{
-			int repairCost = item.getNbt().getInt("RepairCost");
+		if(repairCost == 0) return;
 
-			if(repairCost == 0) return;
-
-			tooltip.add(Text.of("Anvil Uses: " + log2(repairCost + 1)));
-		}
+		tooltip.add(Text.of("Anvil Uses: " + log2(repairCost + 1)));
 	}
 
 	private int log2(int n)
