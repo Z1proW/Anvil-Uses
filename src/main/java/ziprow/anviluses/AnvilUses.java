@@ -2,9 +2,9 @@ package ziprow.anviluses;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,18 +21,16 @@ public class AnvilUses implements ModInitializer
 	{
 		LOGGER.info("AnvilUses is initializing!");
 
-		ItemTooltipCallback.EVENT.register((item, context, type, tooltip) -> onItemTooltip(item, tooltip));
+		ItemTooltipCallback.EVENT.register((item, _, _, tooltip) -> onItemTooltip(item, tooltip));
 	}
 
-	private void onItemTooltip(ItemStack item, List<Text> tooltip)
+	private void onItemTooltip(ItemStack item, List<Component> tooltip)
 	{
-		if(!item.getComponents().contains(DataComponentTypes.REPAIR_COST)) return;
-
-		int repairCost = item.getOrDefault(DataComponentTypes.REPAIR_COST, 0);
+		int repairCost = item.getOrDefault(DataComponents.REPAIR_COST, 0);
 
 		if(repairCost == 0) return;
 
-		tooltip.add(Text.of("Anvil Uses: " + log2(repairCost + 1)));
+		tooltip.add(Component.literal("Anvil Uses: " + log2(repairCost + 1)));
 	}
 
 	private int log2(int n)
